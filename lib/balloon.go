@@ -28,15 +28,15 @@ const (
 	BORDER_SINGLE = 6
 )
 
-type StringWithTerminalWidth struct {
+type strWidth struct {
 	msg  string
 	msgW int
 }
 
-func WrapLines(reader io.Reader, wrapW uint) ([]StringWithTerminalWidth, int) {
+func WrapLines(reader io.Reader, wrapW uint) ([]strWidth, int) {
 	scanner := bufio.NewScanner(reader)
 
-	pairs := []StringWithTerminalWidth{}
+	pairs := []strWidth{}
 	maxW := -1
 
 	for scanner.Scan() {
@@ -45,7 +45,7 @@ func WrapLines(reader io.Reader, wrapW uint) ([]StringWithTerminalWidth, int) {
 
 		for _, l := range strings.Split(s2, "\n") {
 			w := runewidth.StringWidth(l)
-			pairs = append(pairs, StringWithTerminalWidth{msg: l, msgW: w})
+			pairs = append(pairs, strWidth{msg: l, msgW: w})
 
 			if w > maxW {
 				maxW = w
@@ -56,7 +56,7 @@ func WrapLines(reader io.Reader, wrapW uint) ([]StringWithTerminalWidth, int) {
 	return pairs, maxW
 }
 
-func makeBalloon(pairs []StringWithTerminalWidth, border BallonBorder, maxW int) []string {
+func makeBalloon(pairs []strWidth, border BallonBorder, maxW int) []string {
 	ret := []string{}
 
 	ret = append(ret, fmt.Sprintf(" %s \n", strings.Repeat("_", maxW+2)))
