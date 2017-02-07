@@ -19,54 +19,13 @@ import (
 
 type CliOption struct {
 	cow     cowsay.CowOption
+	face    cowsay.FaceOption
 	cowname string
 	list    bool
 	random  bool
 }
 
-type FaceOption struct {
-	Borg     bool
-	Dead     bool
-	Greedy   bool
-	Paranoid bool
-	Stoned   bool
-	Tired    bool
-	Wired    bool
-	Young    bool
-}
-
-func (self FaceOption) MakeUp(opt *cowsay.CowOption) {
-	if self.Borg {
-		opt.Eyes = "=="
-	}
-	if self.Dead {
-		opt.Eyes = "xx"
-		opt.Tongue = "U "
-	}
-	if self.Greedy {
-		opt.Eyes = "$$"
-	}
-	if self.Paranoid {
-		opt.Eyes = "@@"
-	}
-	if self.Stoned {
-		opt.Eyes = "**"
-		opt.Tongue = "U "
-	}
-	if self.Tired {
-		opt.Eyes = "--"
-	}
-	if self.Wired {
-		opt.Eyes = "OO"
-	}
-	if self.Young {
-		opt.Eyes = ".."
-	}
-}
-
 func cmd(opt CliOption) {
-	face := FaceOption{}
-
 	flag.StringVar(&opt.cow.Eyes, "e", cowsay.DefaultCowOption.Eyes, "eyes")
 	flag.StringVar(&opt.cowname, "f", "", "cowname")
 	flag.StringVar(&opt.cow.Tongue, "T", cowsay.DefaultCowOption.Tongue, "tongue")
@@ -74,17 +33,17 @@ func cmd(opt CliOption) {
 	flag.BoolVar(&opt.list, "l", false, "list cows")
 	flag.BoolVar(&opt.random, "random", false, "random select")
 
-	flag.BoolVar(&face.Borg, "b", false, "face borg")
-	flag.BoolVar(&face.Dead, "d", false, "face dead")
-	flag.BoolVar(&face.Greedy, "g", false, "face greedy")
-	flag.BoolVar(&face.Paranoid, "p", false, "face paranoid")
-	flag.BoolVar(&face.Stoned, "s", false, "face stoned")
-	flag.BoolVar(&face.Tired, "t", false, "face tired")
-	flag.BoolVar(&face.Wired, "w", false, "face wired")
-	flag.BoolVar(&face.Young, "y", false, "face young")
+	flag.BoolVar(&opt.face.Borg, "b", false, "face borg")
+	flag.BoolVar(&opt.face.Dead, "d", false, "face dead")
+	flag.BoolVar(&opt.face.Greedy, "g", false, "face greedy")
+	flag.BoolVar(&opt.face.Paranoid, "p", false, "face paranoid")
+	flag.BoolVar(&opt.face.Stoned, "s", false, "face stoned")
+	flag.BoolVar(&opt.face.Tired, "t", false, "face tired")
+	flag.BoolVar(&opt.face.Wired, "w", false, "face wired")
+	flag.BoolVar(&opt.face.Young, "y", false, "face young")
 	flag.Parse()
 	//fmt.Println(opt)
-	face.MakeUp(&opt.cow)
+	opt.face.MakeUp(&opt.cow)
 
 	if opt.list {
 		for _, name := range cowsay.AssetNames() {
