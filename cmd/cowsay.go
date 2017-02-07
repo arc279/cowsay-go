@@ -8,9 +8,11 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	cowsay "github.com/arc279/cowsay-go/lib"
 )
@@ -19,6 +21,7 @@ type CliOption struct {
 	cow     cowsay.CowOption
 	cowname string
 	list    bool
+	random  bool
 }
 
 type FaceOption struct {
@@ -69,6 +72,7 @@ func cmd(opt CliOption) {
 	flag.StringVar(&opt.cow.Tongue, "T", cowsay.DefaultCowOption.Tongue, "tongue")
 	flag.UintVar(&opt.cow.Columns, "W", cowsay.DEFAULT_BALLOON_WIDTH, "columns")
 	flag.BoolVar(&opt.list, "l", false, "list cows")
+	flag.BoolVar(&opt.random, "random", false, "random select")
 
 	flag.BoolVar(&face.Borg, "b", false, "face borg")
 	flag.BoolVar(&face.Dead, "d", false, "face dead")
@@ -103,6 +107,13 @@ func cmd(opt CliOption) {
 	}()
 
 	cow := func() io.Reader {
+		if opt.random {
+			rand.Seed(time.Now().UnixNano())
+			cows := cowsay.AssetNames()
+			i := rand.Intn(len(cows))
+			opt.cowname = cows[i]
+		}
+
 		if len(opt.cowname) == 0 {
 			return strings.NewReader(cowsay.DEFAULT_COW)
 		} else {
