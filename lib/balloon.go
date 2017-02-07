@@ -12,27 +12,21 @@ import (
 
 const DEFAULT_BALLOON_WIDTH uint = 40
 
-type BallonBorder struct {
-	TopL, TopR       string
-	MiddleL, MiddleR string
-	BottomL, BottomR string
+type BallonBorder string
 
-	SingleL, SingleR string
+func (self BallonBorder) Bounds(category int) (uint8, uint8) {
+	return self[category], self[category+1]
 }
 
-var CowSayBallonBorder = BallonBorder{
-	TopL: `/`, TopR: `\`,
-	MiddleL: `|`, MiddleR: `|`,
-	BottomL: `\`, BottomR: `/`,
-	SingleL: `<`, SingleR: `>`,
-}
+const CowSayBallonBorder = `/\||\/<>`
+const CowThinkBallonBorder = `()()()()`
 
-var CowThinkBallonBorder = BallonBorder{
-	TopL: `(`, TopR: `)`,
-	MiddleL: `(`, MiddleR: `)`,
-	BottomL: `(`, BottomR: `)`,
-	SingleL: `(`, SingleR: `)`,
-}
+const (
+	BORDER_TOP    = 0
+	BORDER_MIDDLE = 2
+	BORDER_BOTTOM = 4
+	BORDER_SINGLE = 6
+)
 
 type StringWithTerminalWidth struct {
 	msg  string
@@ -67,18 +61,18 @@ func makeBalloon(pairs []StringWithTerminalWidth, border BallonBorder, maxW int)
 
 	ret = append(ret, fmt.Sprintf(" %s \n", strings.Repeat("_", maxW+2)))
 	for i, p := range pairs {
-		open, close := border.MiddleL, border.MiddleR
+		open, close := border.Bounds(BORDER_MIDDLE)
 		switch i {
 		case 0:
 			if len(pairs) == 1 {
-				open, close = border.SingleL, border.SingleR
+				open, close = border.Bounds(BORDER_SINGLE)
 			} else {
-				open, close = border.TopL, border.TopR
+				open, close = border.Bounds(BORDER_TOP)
 			}
 		case len(pairs) - 1:
-			open, close = border.BottomL, border.BottomR
+			open, close = border.Bounds(BORDER_BOTTOM)
 		}
-		ret = append(ret, fmt.Sprintf("%s %s%s %s\n", open, p.msg, strings.Repeat(" ", maxW-p.msgW), close))
+		ret = append(ret, fmt.Sprintf("%c %s%s %c\n", open, p.msg, strings.Repeat(" ", maxW-p.msgW), close))
 	}
 	ret = append(ret, fmt.Sprintf(" %s \n", strings.Repeat("-", maxW+2)))
 
