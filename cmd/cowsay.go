@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -11,6 +10,7 @@ import (
 	"math/rand"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -20,14 +20,14 @@ import (
 type CliOption struct {
 	cow     cowsay.CowOption
 	face    cowsay.FaceOption
-	cowname string
+	cowfile string
 	list    bool
 	random  bool
 }
 
 func cmd(opt CliOption) {
 	flag.StringVar(&opt.cow.Eyes, "e", cowsay.DefaultCowOption.Eyes, "eyes")
-	flag.StringVar(&opt.cowname, "f", "", "cowname")
+	flag.StringVar(&opt.cowfile, "f", "default.cow", "cowfile")
 	flag.StringVar(&opt.cow.Tongue, "T", cowsay.DefaultCowOption.Tongue, "tongue")
 	flag.UintVar(&opt.cow.Columns, "W", cowsay.DEFAULT_BALLOON_WIDTH, "columns")
 	flag.BoolVar(&opt.list, "l", false, "list cows")
@@ -45,9 +45,17 @@ func cmd(opt CliOption) {
 	//fmt.Println(opt)
 	opt.face.MakeUp(&opt.cow)
 
+	cowlists := func(pattern string) []string {
+		files, err := filepath.Glob(pattern)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return files
+	}(cowsay.COWS_DIR + "*.cow")
+
 	if opt.list {
-		for _, name := range cowsay.AssetNames() {
-			fmt.Println(name)
+		for _, name := range cowlists {
+			fmt.Println(path.Base(name))
 		}
 		os.Exit(2)
 	}
@@ -68,20 +76,15 @@ func cmd(opt CliOption) {
 	cow := func() io.Reader {
 		if opt.random {
 			rand.Seed(time.Now().UnixNano())
-			cows := cowsay.AssetNames()
-			i := rand.Intn(len(cows))
-			opt.cowname = cows[i]
+			i := rand.Intn(len(cowlists))
+			opt.cowfile = path.Base(cowlists[i])
 		}
 
-		if len(opt.cowname) == 0 {
-			return strings.NewReader(cowsay.DEFAULT_COW)
-		} else {
-			data, err := cowsay.Asset(opt.cowname)
-			if err != nil {
-				log.Fatal(err)
-			}
-			return bytes.NewReader(data)
+		fp, err := os.Open(cowsay.COWS_DIR + opt.cowfile)
+		if err != nil {
+			log.Fatal(err)
 		}
+		return fp
 	}()
 
 	err := cowsay.CowSay(cow, msg, opt.cow, os.Stdout)

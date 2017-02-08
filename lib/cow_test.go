@@ -1,6 +1,8 @@
 package cowsay
 
 import (
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
@@ -30,9 +32,13 @@ func TestCowString(t *testing.T) {
 	}
 }
 
-func TestCowAsset(t *testing.T) {
+func TestCow(t *testing.T) {
 	var cowname = "default.cow"
-	data, err := Asset(cowname)
+	fp, err := os.Open(COWS_DIR + cowname)
+	if err != nil {
+		t.Error(err)
+	}
+	data, err := ioutil.ReadAll(fp)
 	if err != nil {
 		t.Error(err)
 	}
