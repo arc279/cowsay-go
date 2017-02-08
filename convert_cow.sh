@@ -4,29 +4,38 @@ set -eu
 
 cd $(cd $(dirname ${BASH_SOURCE:0}); pwd)
 
-COWS_DIR=~/.cowsay-go/
-[ ! -d $COWS_DIR ] && mkdir $COWS_DIR
+SRC_DIR=${1:-share/cows/}
+DST_DIR=~/.cowsay-go/
 
-cat <<EOD >$COWS_DIR/uninstall.sh
+[ ! -d $DST_DIR ] && mkdir $DST_DIR
+
+cat <<EOD >$DST_DIR/.uninstall.sh
 #!/bin/bash
-cd ~
-rm -rf $COWS_DIR
+cd ~ && rm -rf $DST_DIR
 EOD
 
-for input in share/cows/*.cow; do
-    output=${COWS_DIR}$(basename $input)
-    echo "$input -> $output"
+function conv() {
     sed \
+        -e 's/\\e/'$'\e/g' \
+        -e 's/\\u/\\\\u/g' \
+        -e 's/\\N{U+\([0-9]\+\)}/\\u\1/g' \
+        -e 's/\\\\/\\/g' \
+        -e '/binmode/d' \
         -e '/the_cow/d' \
         -e '/EOC/d' \
         -e '/^#.*$/d' \
-        -e 's/\\\\/\\/g' \
         -e 's/$thoughts/{{.Thoughts}}/g' \
         -e 's/${thoughts}/{{.Thoughts}}/g' \
         -e 's/$eyes/{{.Eyes}}/g' \
         -e 's/${eyes}/{{.Eyes}}/g' \
         -e 's/$tongue/{{.Tongue}}/g' \
-        -e 's/${tongue}/{{.Tongue}}/g' \
-        <$input >$output
+        -e 's/${tongue}/{{.Tongue}}/g'
+}
+
+PATTERN="${SRC_DIR}/*.cow"
+for input in ${PATTERN}; do
+    output=${DST_DIR}$(basename "$input")
+    echo "$input -> $output"
+    cat "$input" | conv | xargs -0 printf >"$output"
 done
 
