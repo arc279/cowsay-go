@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 )
@@ -21,7 +22,7 @@ var COWS_DIR = func() string {
 	if val := os.Getenv("COWPATH"); val != "" {
 		return val
 	}
-	return os.ExpandEnv("$HOME/.cowsay-go/")
+	return path.Join(os.Getenv("HOME"), ".cowsay-go", "cows")
 }()
 
 type CowOption struct {

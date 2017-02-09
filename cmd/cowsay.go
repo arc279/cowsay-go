@@ -51,7 +51,7 @@ func cmd(opt CliOption) {
 			log.Fatal(err)
 		}
 		return files
-	}(cowsay.COWS_DIR + "*.cow")
+	}(path.Join(cowsay.COWS_DIR, "*.cow"))
 
 	if opt.list {
 		for _, name := range cowlists {
@@ -75,6 +75,9 @@ func cmd(opt CliOption) {
 
 	cow := func() io.Reader {
 		if opt.random {
+			if len(cowlists) == 0 {
+				return strings.NewReader(cowsay.DEFAULT_COW)
+			}
 			rand.Seed(time.Now().UnixNano())
 			i := rand.Intn(len(cowlists))
 			opt.cowfile = path.Base(cowlists[i])
@@ -84,7 +87,7 @@ func cmd(opt CliOption) {
 			return strings.NewReader(cowsay.DEFAULT_COW)
 		}
 
-		fp, err := os.Open(cowsay.COWS_DIR + opt.cowfile)
+		fp, err := os.Open(path.Join(cowsay.COWS_DIR, opt.cowfile))
 		if err != nil {
 			log.Fatal(err)
 		}
