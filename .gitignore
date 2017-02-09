@@ -1,3 +1,3 @@
-cmd/*
-!cmd/*.go
+cmd/cowsay
+cmd/cowthink
 
