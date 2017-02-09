@@ -10,6 +10,13 @@ import (
 	"text/template"
 )
 
+const DEFAULT_COW = `        {{.Thoughts}}   ^__^
+         {{.Thoughts}}  ({{.Eyes}})\_______
+            (__)\       )\/\
+             {{.Tongue}} ||----w |
+                ||     ||
+`
+
 var COWS_DIR = func() string {
 	if val := os.Getenv("COWPATH"); val != "" {
 		return val

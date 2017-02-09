@@ -32,7 +32,7 @@ func TestCowString(t *testing.T) {
 	}
 }
 
-func TestCow(t *testing.T) {
+func TestCowFile(t *testing.T) {
 	var cowname = "default.cow"
 	fp, err := os.Open(COWS_DIR + cowname)
 	if err != nil {

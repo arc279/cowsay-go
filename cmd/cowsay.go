@@ -27,7 +27,7 @@ type CliOption struct {
 
 func cmd(opt CliOption) {
 	flag.StringVar(&opt.cow.Eyes, "e", cowsay.DefaultCowOption.Eyes, "eyes")
-	flag.StringVar(&opt.cowfile, "f", "default.cow", "cowfile")
+	flag.StringVar(&opt.cowfile, "f", "", "cowfile")
 	flag.StringVar(&opt.cow.Tongue, "T", cowsay.DefaultCowOption.Tongue, "tongue")
 	flag.UintVar(&opt.cow.Columns, "W", cowsay.DEFAULT_BALLOON_WIDTH, "columns")
 	flag.BoolVar(&opt.list, "l", false, "list cows")
@@ -78,6 +78,10 @@ func cmd(opt CliOption) {
 			rand.Seed(time.Now().UnixNano())
 			i := rand.Intn(len(cowlists))
 			opt.cowfile = path.Base(cowlists[i])
+		}
+
+		if opt.cowfile == "" {
+			return strings.NewReader(cowsay.DEFAULT_COW)
 		}
 
 		fp, err := os.Open(cowsay.COWS_DIR + opt.cowfile)
