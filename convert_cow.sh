@@ -7,11 +7,13 @@ cd $(cd $(dirname ${BASH_SOURCE:0}); pwd)
 SRC_DIR=${1:-share/cows/}
 DST_DIR=~/.cowsay-go/
 
-[ ! -d $DST_DIR ] && mkdir $DST_DIR
+[ ! -d $DST_DIR ] && mkdir -p ${DST_DIR}cows/
 
 cat <<EOD >$DST_DIR/.uninstall.sh
 #!/bin/bash
 cd ~ && rm -rf $DST_DIR
+test -x ~/bin/cowsay   && rm ~/bin/cowsay
+test -x ~/bin/cowthink && rm ~/bin/cowthink
 EOD
 
 function conv() {
@@ -32,9 +34,9 @@ function conv() {
         -e 's/${tongue}/{{.Tongue}}/g'
 }
 
-PATTERN="${SRC_DIR}/*.cow"
+PATTERN="${SRC_DIR}*.cow"
 for input in ${PATTERN}; do
-    output=${DST_DIR}$(basename "$input")
+    output=${DST_DIR}cows/$(basename "$input")
     echo "$input -> $output"
     cat "$input" | conv | xargs -0 printf >"$output"
 done

@@ -4,6 +4,8 @@ set -eu
 
 cd $(cd $(dirname ${BASH_SOURCE:0}); pwd)
 
+bash convert_cow.sh
+
 cd cmd
 
 go build cowsay.go
